@@ -6,13 +6,15 @@ import TextField from "@mui/material/TextField";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
 import Link from "@mui/material/Link";
-import { Link as RouterLink } from "react-router-dom";
+import { Link as RouterLink, useHistory } from "react-router-dom";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import PersonIcon from "@mui/icons-material/Person";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { LoginPayload } from "../../interfaces";
+import Client from "../../services/Client";
 
 function Copyright(props: any) {
   return (
@@ -35,14 +37,35 @@ function Copyright(props: any) {
 const theme = createTheme();
 
 export default function SignIn() {
+  const [loginPayload, setLoginPayload] = React.useState<LoginPayload>({
+    email: "",
+    password: "",
+  });
+  const client = Client.getInstance();
+
+  const history = useHistory();
+
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    // eslint-disable-next-line no-console
-    console.log({
-      email: data.get("email"),
-      password: data.get("password"),
-    });
+    console.log(loginPayload);
+    client
+      .loginUser(loginPayload)
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { value, name } = e.target;
+    setLoginPayload((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   return (
@@ -78,6 +101,8 @@ export default function SignIn() {
               name="email"
               autoComplete="email"
               autoFocus
+              value={loginPayload.email}
+              onChange={handleChange}
             />
             <TextField
               margin="normal"
@@ -88,6 +113,8 @@ export default function SignIn() {
               type="password"
               id="password"
               autoComplete="current-password"
+              value={loginPayload.password}
+              onChange={handleChange}
             />
             <FormControlLabel
               control={<Checkbox value="remember" color="primary" />}

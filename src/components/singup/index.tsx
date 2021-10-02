@@ -12,7 +12,9 @@ import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { Link as RouterLink } from "react-router-dom";
+import { Link as RouterLink, useHistory } from "react-router-dom";
+import { RegisterPayload } from "../../interfaces";
+import Client from "../../services/Client";
 
 function Copyright(props: any) {
   return (
@@ -35,15 +37,37 @@ function Copyright(props: any) {
 const theme = createTheme();
 
 export default function SignUp() {
+  const [registerPayload, setRegisterPayload] = React.useState<RegisterPayload>(
+    { email: "", username: "", password: "" }
+  );
+
+  const client = Client.getInstance();
+
+  const history = useHistory();
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { value, name } = e.target;
+    setRegisterPayload((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
     // eslint-disable-next-line no-console
-    console.log({
-      email: data.get("email"),
-      username: data.get("username"),
-      password: data.get("password"),
-    });
+    console.log(registerPayload);
+
+    client
+      .registerUser(registerPayload)
+      .then((_) => {
+        history.push("/login");
+      })
+      .catch((err) => {
+        alert(err);
+      });
   };
 
   return (
@@ -79,6 +103,8 @@ export default function SignUp() {
               name="email"
               autoComplete="email"
               autoFocus
+              value={registerPayload.email}
+              onChange={handleChange}
             />
             <TextField
               margin="normal"
@@ -88,6 +114,8 @@ export default function SignUp() {
               label="Username"
               name="username"
               autoComplete="username"
+              value={registerPayload.username}
+              onChange={handleChange}
             />
             <TextField
               margin="normal"
@@ -98,6 +126,8 @@ export default function SignUp() {
               type="password"
               id="password"
               autoComplete="current-password"
+              value={registerPayload.password}
+              onChange={handleChange}
             />
             <FormControlLabel
               control={<Checkbox value="remember" color="primary" />}
