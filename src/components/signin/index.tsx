@@ -15,6 +15,19 @@ import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { LoginPayload } from "../../interfaces";
 import Client from "../../services/Client";
+import { useFormik } from "formik";
+import * as yup from "yup";
+
+const validationSchema = yup.object({
+  email: yup
+    .string()
+    .email("Enter a valid email")
+    .required("Email is required"),
+  password: yup
+    .string()
+    .min(6, "Password should be of minimum 6 characters length")
+    .required("Password is required"),
+});
 
 function Copyright(props: any) {
   return (
@@ -36,37 +49,31 @@ function Copyright(props: any) {
 
 const theme = createTheme();
 
-export default function SignIn() {
-  const [loginPayload, setLoginPayload] = React.useState<LoginPayload>({
-    email: "",
-    password: "",
-  });
-  const client = Client.getInstance();
+const initialValues: LoginPayload = {
+  email: "",
+  password: "",
+};
 
+export default function SignIn() {
+  const client = Client.getInstance();
   const history = useHistory();
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    console.log(loginPayload);
-    client
-      .loginUser(loginPayload)
-      .then((res) => {
-        console.log(res);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { value, name } = e.target;
-    setLoginPayload((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
+  const formik = useFormik<LoginPayload>({
+    initialValues,
+    validationSchema: validationSchema,
+    onSubmit: (values) => {
+      alert(JSON.stringify(values, null, 2));
+      client
+        .loginUser(values)
+        .then((res) => {
+          console.log(res);
+          history.push("/");
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+  });
 
   return (
     <ThemeProvider theme={theme}>
@@ -88,7 +95,7 @@ export default function SignIn() {
           </Typography>
           <Box
             component="form"
-            onSubmit={handleSubmit}
+            onSubmit={formik.handleSubmit}
             noValidate
             sx={{ mt: 1 }}
           >
@@ -101,8 +108,10 @@ export default function SignIn() {
               name="email"
               autoComplete="email"
               autoFocus
-              value={loginPayload.email}
-              onChange={handleChange}
+              value={formik.values.email}
+              onChange={formik.handleChange}
+              error={formik.touched.email && Boolean(formik.errors.email)}
+              helperText={formik.touched.email && formik.errors.email}
             />
             <TextField
               margin="normal"
@@ -113,8 +122,10 @@ export default function SignIn() {
               type="password"
               id="password"
               autoComplete="current-password"
-              value={loginPayload.password}
-              onChange={handleChange}
+              value={formik.values.password}
+              onChange={formik.handleChange}
+              error={formik.touched.password && Boolean(formik.errors.password)}
+              helperText={formik.touched.password && formik.errors.password}
             />
             <FormControlLabel
               control={<Checkbox value="remember" color="primary" />}
