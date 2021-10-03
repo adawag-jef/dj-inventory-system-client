@@ -36,12 +36,12 @@ export default abstract class HttpClient {
       );
       return Promise.reject(error);
     }
-
     if (
       error.response.status === 401 &&
+      error.response.data.details === "nvalid credentials" &&
       originalRequest.url === this.baseURL + "/auth/token-refresh/"
     ) {
-      window.location.href = "/login/";
+      // window.location.href = "/login/";
       return Promise.reject(error);
     }
 
@@ -50,7 +50,7 @@ export default abstract class HttpClient {
       error.response.status === 401 &&
       error.response.statusText === "Unauthorized"
     ) {
-      const refreshToken = localStorage.getItem("refresh-token");
+      const refreshToken = localStorage.getItem("refresh_token");
 
       if (refreshToken) {
         const tokenParts = JSON.parse(atob(refreshToken.split(".")[1]));
@@ -88,7 +88,8 @@ export default abstract class HttpClient {
         }
       } else {
         console.log("Refresh token not available.");
-        window.location.href = "/login/";
+        return Promise.reject(error);
+        // window.location.href = "/login/";
       }
     }
 

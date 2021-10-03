@@ -1,3 +1,4 @@
+import { IUser } from "../features/auth/authSlice";
 import { LoginPayload, RegisterPayload } from "../interfaces";
 import HttpClient from "./HttpClient";
 
@@ -21,6 +22,9 @@ export default class Client extends HttpClient {
       "/auth/register/",
       registerPayload
     );
-  public loginUser = (loginPayload: LoginPayload) =>
-    this.axiosInstance.post<LoginPayload>("/auth/login/", loginPayload);
+  public loginUser = async (loginPayload: LoginPayload) =>
+    await this.axiosInstance.post<LoginPayload, IUser>(
+      "/auth/login/",
+      loginPayload
+    );
 }

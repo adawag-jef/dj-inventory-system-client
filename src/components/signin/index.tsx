@@ -1,22 +1,23 @@
-import * as React from "react";
-import Avatar from "@mui/material/Avatar";
-import Button from "@mui/material/Button";
-import CssBaseline from "@mui/material/CssBaseline";
-import TextField from "@mui/material/TextField";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
-import Link from "@mui/material/Link";
-import { Link as RouterLink, useHistory } from "react-router-dom";
-import Grid from "@mui/material/Grid";
-import Box from "@mui/material/Box";
 import PersonIcon from "@mui/icons-material/Person";
-import Typography from "@mui/material/Typography";
+import Avatar from "@mui/material/Avatar";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Checkbox from "@mui/material/Checkbox";
 import Container from "@mui/material/Container";
+import CssBaseline from "@mui/material/CssBaseline";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Grid from "@mui/material/Grid";
+import Link from "@mui/material/Link";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { LoginPayload } from "../../interfaces";
-import Client from "../../services/Client";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
 import { useFormik } from "formik";
+import * as React from "react";
+import { Link as RouterLink, useHistory } from "react-router-dom";
 import * as yup from "yup";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import { loginUser, selectAuth } from "../../features/auth/authSlice";
+import { LoginPayload } from "../../interfaces";
 
 const validationSchema = yup.object({
   email: yup
@@ -55,23 +56,22 @@ const initialValues: LoginPayload = {
 };
 
 export default function SignIn() {
-  const client = Client.getInstance();
+  const dispatch = useAppDispatch();
+  const { isAuthenticated } = useAppSelector(selectAuth);
+
   const history = useHistory();
+
+  React.useEffect(() => {
+    if (isAuthenticated) {
+      history.push("/");
+    }
+  }, [isAuthenticated, history]);
 
   const formik = useFormik<LoginPayload>({
     initialValues,
     validationSchema: validationSchema,
     onSubmit: (values) => {
-      alert(JSON.stringify(values, null, 2));
-      client
-        .loginUser(values)
-        .then((res) => {
-          console.log(res);
-          history.push("/");
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+      dispatch(loginUser(values));
     },
   });
 
