@@ -173,19 +173,27 @@ const DataTable: React.FC<IDataTableProps> = ({
   useEffect(() => {
     let qs = "?";
     if (order && orderBy) {
-      qs += `&_sort=${String(orderBy)}&_order=${order}`;
+      if (order === "asc") {
+        qs += `&ordering=${String(orderBy)}`;
+      } else if (order === "desc") {
+        qs += `&ordering=-${String(orderBy)}`;
+      }
+      // qs += `&_sort=${String(orderBy)}&_order=${order}`;
     }
     if (page) {
       let _page = page + 1; //we add one bcoz mui pagination starts with zero
-      qs += `&_page=${_page}`;
+      qs += `&page=${_page}`;
+      // qs += `&_page=${_page}`;
     }
 
     if (rowsPerPage) {
-      qs += `&_limit=${rowsPerPage}`;
+      qs += `&page_size=${rowsPerPage}`;
+      // qs += `&_limit=${rowsPerPage}`;
     }
 
     if (search) {
-      qs += `&q=${search}`;
+      qs += `&search=${search}`;
+      // qs += `&q=${search}`;
     }
 
     onChange(qs);

@@ -17,6 +17,10 @@ export default class Client extends HttpClient {
     return this.classInstance;
   }
 
+  public get<P, R = {}>(uri: string) {
+    return this.axiosInstance.get<P, R>(uri);
+  }
+
   public registerUser = (registerPayload: RegisterPayload) =>
     this.axiosInstance.post<RegisterPayload>(
       "/auth/register/",

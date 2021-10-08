@@ -18,3 +18,10 @@ export interface TokenResponse {
   access?: string;
   refresh?: string;
 }
+
+export interface IPermission {
+  id: number;
+  title: string;
+  diescription: string;
+  create_at: Date;
+}
