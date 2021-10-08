@@ -9,17 +9,21 @@ import {
   TableHead,
   TableRow,
   TableSortLabel,
+  TextField,
+  LinearProgress,
 } from "@mui/material";
 
 import { createStyles, makeStyles } from "@mui/styles";
 
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
+import { debounce } from "lodash";
 
-interface IDataTableColumn {
+export interface IDataTableColumn {
   id: string;
   name: string;
   enableSort?: boolean;
   align?: "center" | "inherit" | "justify" | "left" | "right";
+  action?: (item: any) => JSX.Element;
 }
 
 interface IDataTableHeadProps {
@@ -31,49 +35,15 @@ interface IDataTableHeadProps {
     property: keyof any
   ) => void;
 }
-
 interface IDataTableProps {
   rows: any[];
   columnData: IDataTableColumn[];
-  onChange: Function;
+  onChange: (qs: string) => void;
   total: number;
+  loading: boolean;
 }
 
-// function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
-//   console.warn(a, b, orderBy);
-//   if (b[orderBy] < a[orderBy]) {
-//     return -1;
-//   }
-//   if (b[orderBy] > a[orderBy]) {
-//     return 1;
-//   }
-//   return 0;
-// }
-
 type Order = "asc" | "desc";
-
-// function getComparator<Key extends keyof any>(
-//   order: Order,
-//   orderBy: Key
-// ): (
-//   a: { [key in Key]: number | string },
-//   b: { [key in Key]: number | string }
-// ) => number {
-//   return order === "desc"
-//     ? (a, b) => descendingComparator(a, b, orderBy)
-//     : (a, b) => -descendingComparator(a, b, orderBy);
-// }
-
-// function stableSort<T>(array: T[], comparator: (a: T, b: T) => number) {
-//   const stabilizedThis = array.map((el, index) => [el, index] as [T, number]);
-//   stabilizedThis.sort((a, b) => {
-//     const order = comparator(a[0], b[0]);
-//     if (order !== 0) return order;
-//     return a[1] - b[1];
-//   });
-//   console.warn(stabilizedThis);
-//   return stabilizedThis.map((el) => el[0]);
-// }
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -152,37 +122,29 @@ const DataTable: React.FC<IDataTableProps> = ({
   rows,
   onChange,
   total,
+  loading,
 }): JSX.Element => {
   console.log(columnData, rows);
-  //   let internalColumnData: IDataTableColumn[] = [
-  //     {
-  //       id: "",
-  //       name: "",
-  //       align: "inherit",
-  //       enableSort: false,
-  //     },
-  //   ];
-  //   if (!columnData) {
-  //     if (rows.length) {
-  //       internalColumnData.length = 0;
-  //       Object.keys(rows[0]).map((key) => {
-  //         internalColumnData.push({
-  //           id: String(key),
-  //           name: String(key),
-  //           align: "inherit",
-  //           enableSort: false,
-  //         });
-  //       });
-  //     }
-  //   } else {
-  //     internalColumnData = columnData;
-  //   }
 
   const classes = useStyles();
   const [order, setOrder] = React.useState<Order>("asc");
   const [orderBy, setOrderBy] = React.useState<keyof any>("");
-  const [page, setPage] = React.useState(1);
+  const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [search, setSearch] = React.useState("");
+
+  const debounceValue = debounce((value) => {
+    console.log(value);
+  }, 1000);
+
+  const debouceRequest = useCallback((value: any) => debounceValue(value), []);
+
+  const handleSeachChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    debouceRequest(e.target.value);
+    setSearch(e.target.value);
+  };
 
   const handleRequestSort = (
     event: React.MouseEvent<unknown>,
@@ -214,14 +176,20 @@ const DataTable: React.FC<IDataTableProps> = ({
       qs += `&_sort=${String(orderBy)}&_order=${order}`;
     }
     if (page) {
-      qs += `&_page=${page}`;
+      let _page = page + 1; //we add one bcoz mui pagination starts with zero
+      qs += `&_page=${_page}`;
     }
 
     if (rowsPerPage) {
       qs += `&_limit=${rowsPerPage}`;
     }
+
+    if (search) {
+      qs += `&q=${search}`;
+    }
+
     onChange(qs);
-  }, [order, orderBy, page, rowsPerPage]);
+  }, [order, orderBy, page, rowsPerPage, search]);
 
   //   const emptyRows = rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
 
@@ -229,6 +197,16 @@ const DataTable: React.FC<IDataTableProps> = ({
     <React.Fragment>
       <div className={classes.root}>
         <Paper className={classes.paper}>
+          <div style={{ padding: 8 }}>
+            <TextField
+              placeholder="Search"
+              value={search}
+              onChange={handleSeachChange}
+              size="small"
+              fullWidth
+            />
+          </div>
+          {loading && <LinearProgress />}
           <TableContainer>
             <Table aria-labelledby="tableTitle" aria-label="enhanced table">
               <DataTableHead
@@ -237,21 +215,24 @@ const DataTable: React.FC<IDataTableProps> = ({
                 orderBy={orderBy}
                 onRequestSort={handleRequestSort}
               />
+
               <TableBody>
-                {/* {stableSort(rows, getComparator(order, orderBy))
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) */}
                 {rows.map((row) => {
                   console.log(row);
                   return (
                     <TableRow>
-                      {/* {Object.keys(row).map((key, index) => (
-                        <TableCell align={"left"} key={key}>
-                          {row[key]}
-                        </TableCell>
-                      ))} */}
-                      {columnData.map((col) => (
-                        <TableCell align={col.align}>{row[col.id]}</TableCell>
-                      ))}
+                      {columnData.map((col) => {
+                        if (col.action) {
+                          return (
+                            <TableCell align={col.align}>
+                              {col.action(row)}
+                            </TableCell>
+                          );
+                        }
+                        return (
+                          <TableCell align={col.align}>{row[col.id]}</TableCell>
+                        );
+                      })}
                     </TableRow>
                   );
                 })}
