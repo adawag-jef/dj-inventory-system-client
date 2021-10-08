@@ -1,20 +1,20 @@
-import { IPermission } from "../interfaces";
+import { IPermission, Response } from "../interfaces";
 import Client from "./Client";
 
 const client = Client.getInstance();
 
-interface Response {
-  page: number;
-  size_per_page: number;
-  total_pages: number;
-  total: number;
-  results: IPermission[];
-}
-
 class PermissionService {
-  public fetchAllPermissions(qs: string) {
+  public fetchAllPermissions(qs: string): Promise<Response<IPermission>> {
     const uri = `auth/permission/${qs}`;
-    return client.get<{}, Response>(uri);
+
+    return new Promise(async (res, rej) => {
+      try {
+        const response = await client.get<{}, Response<IPermission>>(uri);
+        return res(response);
+      } catch (error) {
+        return rej(error);
+      }
+    });
   }
 }
 

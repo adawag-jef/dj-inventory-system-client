@@ -25,3 +25,11 @@ export interface IPermission {
   diescription: string;
   create_at: Date;
 }
+
+export interface Response<T> {
+  page: number;
+  size_per_page: number;
+  total_pages: number;
+  total: number;
+  results: T[];
+}

@@ -1,5 +1,4 @@
 import axios, { AxiosInstance, AxiosResponse } from "axios";
-
 declare module "axios" {
   interface AxiosResponse<T = never> extends Promise<T> {}
 }
@@ -27,7 +26,6 @@ export default abstract class HttpClient {
 
   protected _handleError = (error: any) => {
     const originalRequest = error.config;
-
     if (typeof error.response === "undefined") {
       alert(
         "A server/network error occurred. " +
@@ -38,7 +36,9 @@ export default abstract class HttpClient {
     }
     if (
       error.response.status === 401 &&
-      error.response.data.details === "nvalid credentials" &&
+      (error.response.data.details === "Invalid credentials" ||
+        error.response.data.detail ===
+          "Authentication credentials were not provided.") &&
       originalRequest.url === this.baseURL + "/auth/token-refresh/"
     ) {
       // window.location.href = "/login/";
@@ -65,22 +65,20 @@ export default abstract class HttpClient {
               refresh: refreshToken,
             })
             .then((response: any) => {
-              localStorage.setItem(
-                "access_token",
-                String(response.data.tokens.access)
-              );
+              localStorage.setItem("access_token", String(response.access));
               // localStorage.setItem('refresh_token', response.data.refresh);
               if (this.axiosInstance.defaults.headers) {
                 this.axiosInstance.defaults.headers["Authorization"] =
-                  "Bearer " + response.data.tokens.access;
+                  "Bearer " + response.access;
                 originalRequest.headers["Authorization"] =
-                  "Bearer " + response.data.access;
+                  "Bearer " + response.access;
               }
 
               return this.axiosInstance(originalRequest);
             })
             .catch((err) => {
-              console.log(err);
+              localStorage.clear();
+              return Promise.reject(error);
             });
         } else {
           console.log("Refresh token is expired", tokenParts.exp, now);
@@ -88,8 +86,9 @@ export default abstract class HttpClient {
         }
       } else {
         console.log("Refresh token not available.");
+        localStorage.clear();
+        window.location.href = "/login/";
         return Promise.reject(error);
-        // window.location.href = "/login/";
       }
     }
 

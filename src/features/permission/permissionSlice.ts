@@ -7,8 +7,12 @@ import { apiCallEnd, apiCallFail, apiCallStart } from "../loader/loaderSlice";
 export const fetchAllPermissions = createAsyncThunk(
   "permission/fetchAllPermissions",
   async (qs: string, thunkAPI) => {
-    const response = await permissionService.fetchAllPermissions(qs);
-    return response;
+    try {
+      const response = await permissionService.fetchAllPermissions(qs);
+      return response;
+    } catch (error) {
+      throw error;
+    }
   }
 );
 
@@ -46,6 +50,7 @@ export const permissionSlice = createSlice({
       })
       .addCase(fetchAllPermissions.rejected, (state) => {
         state.status = "failed";
+        state.permissions = [];
       });
   },
 });
