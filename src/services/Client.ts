@@ -6,7 +6,7 @@ export default class Client extends HttpClient {
   private static classInstance?: Client;
 
   private constructor() {
-    super("http://127.0.0.1:8000/api/");
+    super("https://dj-inventory.herokuapp.com/api/");
   }
 
   public static getInstance() {
