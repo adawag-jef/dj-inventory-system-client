@@ -165,11 +165,11 @@ const AdminLayout: React.FC = ({ children }) => {
               </ListItemIcon>
               <ListItemText primary="Permissions" />
             </ListItem>
-            <ListItem button>
+            <ListItem button onClick={() => history.push("/users")}>
               <ListItemIcon>
                 <PeopleIcon />
               </ListItemIcon>
-              <ListItemText primary="Customers" />
+              <ListItemText primary="Users" />
             </ListItem>
             <ListItem button>
               <ListItemIcon>

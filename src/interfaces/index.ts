@@ -1,3 +1,5 @@
+import { NumberLiteralType } from "typescript";
+
 export interface RegisterPayload {
   email: string;
   username: string;
@@ -24,6 +26,12 @@ export interface IPermission {
   title: string;
   diescription: string;
   create_at: Date;
+}
+
+export interface IUser {
+  id: number;
+  email: string;
+  username: string;
 }
 
 export interface Response<T> {

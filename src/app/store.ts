@@ -7,11 +7,13 @@ import { persistReducer } from "redux-persist";
 import authSlice from "../features/auth/authSlice";
 import loaderSlice from "../features/loader/loaderSlice";
 import permissionSlice from "../features/permission/permissionSlice";
+import userSlice from "../features/user/userSlice";
 
 const reducers = combineReducers({
   auth: authSlice,
   loader: loaderSlice,
   permission: permissionSlice,
+  users: userSlice,
 });
 
 const persistConfig = {
