@@ -13,9 +13,9 @@ const App: React.FC = (props) => {
       <Router>
         <Switch>
           <Route exact path="/" component={HomePage} />
-          <Route exact path="/login" component={LoginPage} />
-          <Route exact path="/register" component={RegisterPage} />
-          <Route exact path="/permissions" component={PermissionPage} />
+          <Route path="/login" component={LoginPage} />
+          <Route path="/register" component={RegisterPage} />
+          <Route path="/permissions" component={PermissionPage} />
         </Switch>
       </Router>
     </Loader>
