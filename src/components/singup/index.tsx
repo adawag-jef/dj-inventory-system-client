@@ -1,28 +1,26 @@
-import * as React from "react";
-import Avatar from "@mui/material/Avatar";
-import Button from "@mui/material/Button";
-import CssBaseline from "@mui/material/CssBaseline";
-import TextField from "@mui/material/TextField";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
-import Link from "@mui/material/Link";
-import Grid from "@mui/material/Grid";
-import Box from "@mui/material/Box";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
-import Typography from "@mui/material/Typography";
+import Avatar from "@mui/material/Avatar";
+import Box from "@mui/material/Box";
+import Checkbox from "@mui/material/Checkbox";
 import Container from "@mui/material/Container";
+import CssBaseline from "@mui/material/CssBaseline";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Grid from "@mui/material/Grid";
+import Link from "@mui/material/Link";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { Link as RouterLink, useHistory } from "react-router-dom";
-import { RegisterPayload } from "../../interfaces";
-import Client from "../../services/Client";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
 import { useFormik } from "formik";
+import * as React from "react";
+import { Link as RouterLink, useHistory } from "react-router-dom";
 import * as yup from "yup";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
-  selectAuth,
   registerUser,
   resetStatus,
+  selectAuth,
 } from "../../features/auth/authSlice";
+import { RegisterPayload } from "../../interfaces";
 import LoadingButton from "../controls/loading-button";
 
 function Copyright(props: any) {

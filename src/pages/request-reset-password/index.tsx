@@ -1,7 +1,6 @@
 import PersonIcon from "@mui/icons-material/Person";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
 import CssBaseline from "@mui/material/CssBaseline";
 import Grid from "@mui/material/Grid";
@@ -17,8 +16,8 @@ import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import LoadingButton from "../../components/controls/loading-button";
 import {
   requestResetPassword,
-  selectAuth,
   resetStatus,
+  selectAuth,
 } from "../../features/auth/authSlice";
 import { IRequestResetPasswordPayload } from "../../interfaces";
 

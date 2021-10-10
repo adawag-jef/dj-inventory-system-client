@@ -5,7 +5,6 @@ import {
   LoginPayload,
   RegisterPayload,
   SetNewPasswordPayload,
-  Response,
 } from "../../interfaces";
 import Client from "../../services/Client";
 
