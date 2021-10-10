@@ -1,10 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React from "react";
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import { BrowserRouter as Router, Switch } from "react-router-dom";
 import { useAppDispatch } from "./app/hooks";
 import { verifyCurrentUser } from "./features/auth/authSlice";
 import Loader from "./features/loader/Loader";
 import AuthenticatedRoute from "./hoc/AdminRoute";
+import UnAuthenticatedRoute from "./hoc/UnAuthenticatedRoute";
 import HomePage from "./pages/home";
 import LoginPage from "./pages/login";
 import PasswordReset from "./pages/password-reset";
@@ -29,14 +30,18 @@ const App: React.FC = (props) => {
       <Router>
         <Switch>
           <AuthenticatedRoute exact path="/" component={HomePage} />
-          <Route exact path="/login" component={LoginPage} />
-          <Route exact path="/register" component={RegisterPage} />
-          <Route
+          <UnAuthenticatedRoute exact path="/login" component={LoginPage} />
+          <UnAuthenticatedRoute
+            exact
+            path="/register"
+            component={RegisterPage}
+          />
+          <UnAuthenticatedRoute
             exact
             path="/request-reset-password"
             component={RequestResetPassword}
           />
-          <Route
+          <UnAuthenticatedRoute
             exact
             path="/password-reset/:uidb64/:token"
             component={PasswordReset}
