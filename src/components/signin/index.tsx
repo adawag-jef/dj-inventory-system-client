@@ -12,7 +12,7 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { useFormik } from "formik";
 import * as React from "react";
-import { Link as RouterLink, useHistory } from "react-router-dom";
+import { Link as RouterLink } from "react-router-dom";
 import * as yup from "yup";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { loginUser, selectAuth } from "../../features/auth/authSlice";
@@ -57,15 +57,7 @@ const initialValues: LoginPayload = {
 
 export default function SignIn() {
   const dispatch = useAppDispatch();
-  const { isAuthenticated, status } = useAppSelector(selectAuth);
-
-  const history = useHistory();
-
-  React.useEffect(() => {
-    if (isAuthenticated) {
-      history.push("/");
-    }
-  }, [isAuthenticated, history]);
+  const { status } = useAppSelector(selectAuth);
 
   const formik = useFormik<LoginPayload>({
     initialValues,

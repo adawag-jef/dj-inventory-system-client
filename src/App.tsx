@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 
 import Loader from "./features/loader/Loader";
+import AuthenticatedRoute from "./hoc/AdminRoute";
 import HomePage from "./pages/home";
 import LoginPage from "./pages/login";
 import PasswordReset from "./pages/password-reset";
@@ -15,7 +16,7 @@ const App: React.FC = (props) => {
     <Loader>
       <Router>
         <Switch>
-          <Route exact path="/" component={HomePage} />
+          <AuthenticatedRoute exact path="/" component={HomePage} />
           <Route exact path="/login" component={LoginPage} />
           <Route exact path="/register" component={RegisterPage} />
           <Route
@@ -28,8 +29,12 @@ const App: React.FC = (props) => {
             path="/password-reset/:uidb64/:token"
             component={PasswordReset}
           />
-          <Route exact path="/users" component={UserPage} />
-          <Route exact path="/permissions" component={PermissionPage} />
+          <AuthenticatedRoute exact path="/users" component={UserPage} />
+          <AuthenticatedRoute
+            exact
+            path="/permissions"
+            component={PermissionPage}
+          />
         </Switch>
       </Router>
     </Loader>
