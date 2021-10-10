@@ -1,6 +1,8 @@
 import { IconButton } from "@mui/material";
 import React from "react";
-import DataTable, { IDataTableColumn } from "../../components/datatable";
+import DataTable, {
+  IDataTableColumn,
+} from "../../components/controls/datatable";
 import AdminLayout from "../../Layouts/AdminLayout";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
