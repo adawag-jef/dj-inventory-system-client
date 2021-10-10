@@ -17,6 +17,13 @@ import { RegisterPayload } from "../../interfaces";
 import Client from "../../services/Client";
 import { useFormik } from "formik";
 import * as yup from "yup";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import {
+  selectAuth,
+  registerUser,
+  resetStatus,
+} from "../../features/auth/authSlice";
+import LoadingButton from "../controls/loading-button";
 
 function Copyright(props: any) {
   return (
@@ -52,22 +59,23 @@ const validationSchema = yup.object({
     .required("Password is required"),
 });
 export default function SignUp() {
-  const client = Client.getInstance();
+  const { status, error } = useAppSelector(selectAuth);
+  const dispatch = useAppDispatch();
   const history = useHistory();
+
+  React.useEffect(() => {
+    if (status === "success") {
+      history.push("/login");
+      dispatch(resetStatus());
+    }
+  }, [status, history, dispatch]);
 
   const formik = useFormik<RegisterPayload>({
     initialValues,
     validationSchema,
     onSubmit(values) {
       console.log(values);
-      client
-        .registerUser(values)
-        .then((_) => {
-          history.push("/login");
-        })
-        .catch((err) => {
-          alert(err);
-        });
+      dispatch(registerUser(values));
     },
   });
 
@@ -106,8 +114,14 @@ export default function SignUp() {
               autoFocus
               value={formik.values.email}
               onChange={formik.handleChange}
-              error={formik.touched.email && Boolean(formik.errors.email)}
-              helperText={formik.touched.email && formik.errors.email}
+              error={
+                (formik.touched.email && Boolean(formik.errors.email)) ||
+                error?.errors?.email
+              }
+              helperText={
+                (formik.touched.email && formik.errors.email) ||
+                (error?.errors?.email && error?.errors?.email[0])
+              }
             />
             <TextField
               margin="normal"
@@ -119,8 +133,14 @@ export default function SignUp() {
               autoComplete="username"
               value={formik.values.username}
               onChange={formik.handleChange}
-              error={formik.touched.username && Boolean(formik.errors.username)}
-              helperText={formik.touched.username && formik.errors.username}
+              error={
+                (formik.touched.username && Boolean(formik.errors.username)) ||
+                error?.errors?.username
+              }
+              helperText={
+                (formik.touched.username && formik.errors.username) ||
+                (error?.errors?.username && error?.errors?.username[0])
+              }
             />
             <TextField
               margin="normal"
@@ -140,14 +160,23 @@ export default function SignUp() {
               control={<Checkbox value="remember" color="primary" />}
               label="Remember me"
             />
-            <Button
+            {/* <Button
               type="submit"
               fullWidth
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
             >
               Sign In
-            </Button>
+            </Button> */}
+            <LoadingButton
+              type="submit"
+              fullWidth
+              variant="contained"
+              sx={{ mt: 3, mb: 2 }}
+              loading={status === "loading"}
+            >
+              Sign In
+            </LoadingButton>
             <Grid container>
               <Grid item xs>
                 <Link to="#" component={RouterLink} variant="body2">

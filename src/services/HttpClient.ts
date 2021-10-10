@@ -26,12 +26,20 @@ export default abstract class HttpClient {
 
   protected _handleError = (error: any) => {
     const originalRequest = error.config;
+    debugger;
+
     if (typeof error.response === "undefined") {
       alert(
         "A server/network error occurred. " +
           "Looks like CORS might be the problem. " +
           "Sorry about this - we will get it fixed shortly."
       );
+      return Promise.reject(error);
+    }
+    if (
+      error.response.status === 401 &&
+      error.response.data.detail === "Email is not verified"
+    ) {
       return Promise.reject(error);
     }
     if (
@@ -51,7 +59,6 @@ export default abstract class HttpClient {
       error.response.statusText === "Unauthorized"
     ) {
       const refreshToken = localStorage.getItem("refresh_token");
-
       if (refreshToken) {
         const tokenParts = JSON.parse(atob(refreshToken.split(".")[1]));
 
@@ -87,7 +94,7 @@ export default abstract class HttpClient {
       } else {
         console.log("Refresh token not available.");
         localStorage.clear();
-        window.location.href = "/login/";
+        // window.location.href = "/login/";
         return Promise.reject(error);
       }
     }

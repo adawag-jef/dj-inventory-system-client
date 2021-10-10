@@ -1,12 +1,17 @@
 import { IUser } from "../features/auth/authSlice";
-import { LoginPayload, RegisterPayload } from "../interfaces";
+import {
+  IRequestResetPasswordPayload,
+  LoginPayload,
+  RegisterPayload,
+  SetNewPasswordPayload,
+} from "../interfaces";
 import HttpClient from "./HttpClient";
 
 export default class Client extends HttpClient {
   private static classInstance?: Client;
 
   private constructor() {
-    super("https://dj-inventory.herokuapp.com/api/");
+    super("http://localhost:8000/api/");
   }
 
   public static getInstance() {
@@ -22,7 +27,7 @@ export default class Client extends HttpClient {
   }
 
   public registerUser = (registerPayload: RegisterPayload) =>
-    this.axiosInstance.post<RegisterPayload>(
+    this.axiosInstance.post<RegisterPayload, IUser>(
       "/auth/register/",
       registerPayload
     );
@@ -31,4 +36,19 @@ export default class Client extends HttpClient {
       "/auth/login/",
       loginPayload
     );
+
+  public requestResetPassword = async (
+    requestPayload: IRequestResetPasswordPayload
+  ) => {
+    return await this.axiosInstance.post<IRequestResetPasswordPayload>(
+      "/auth/request-reset-email/",
+      requestPayload
+    );
+  };
+  public setNewPassword = async (requestPayload: SetNewPasswordPayload) => {
+    return await this.axiosInstance.patch<SetNewPasswordPayload>(
+      "/auth/password-reset-complete/",
+      requestPayload
+    );
+  };
 }

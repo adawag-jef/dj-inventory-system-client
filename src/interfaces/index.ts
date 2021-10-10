@@ -1,5 +1,3 @@
-import { NumberLiteralType } from "typescript";
-
 export interface RegisterPayload {
   email: string;
   username: string;
@@ -8,6 +6,15 @@ export interface RegisterPayload {
 export interface LoginPayload {
   email: string;
   password: string;
+}
+
+export interface SetNewPasswordPayload {
+  password: string;
+  token: string;
+  uidb64: string;
+}
+export interface IRequestResetPasswordPayload {
+  email: string;
 }
 
 export interface LoginResponse {

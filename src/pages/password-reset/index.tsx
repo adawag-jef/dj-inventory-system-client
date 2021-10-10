@@ -1,3 +1,5 @@
+import { RouteComponentProps } from "react-router-dom";
+
 import PersonIcon from "@mui/icons-material/Person";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
@@ -16,19 +18,25 @@ import * as React from "react";
 import { Link as RouterLink, useHistory } from "react-router-dom";
 import * as yup from "yup";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { loginUser, selectAuth } from "../../features/auth/authSlice";
-import { LoginPayload } from "../../interfaces";
-import LoadingButton from "../controls/loading-button";
+import {
+  setNewPassword,
+  selectAuth,
+  resetStatus,
+} from "../../features/auth/authSlice";
+import { SetNewPasswordPayload } from "../../interfaces";
+
+interface IPasswordResetProps
+  extends RouteComponentProps<{ uidb64: string; token: string }> {}
 
 const validationSchema = yup.object({
-  email: yup
-    .string()
-    .email("Enter a valid email")
-    .required("Email is required"),
   password: yup
     .string()
-    .min(6, "Password should be of minimum 6 characters length")
-    .required("Password is required"),
+    .required("Password is required")
+    .min(6, "Password must be atleast 6 characters"),
+  cf_password: yup
+    .string()
+    .oneOf([yup.ref("password"), null], "Passwords must match")
+    .min(6, "Password must be atleast 6 characters"),
 });
 
 function Copyright(props: any) {
@@ -51,28 +59,35 @@ function Copyright(props: any) {
 
 const theme = createTheme();
 
-const initialValues: LoginPayload = {
-  email: "",
+type IInitialValue = SetNewPasswordPayload & { cf_password: string };
+
+const initialValues: IInitialValue = {
   password: "",
+  token: "",
+  uidb64: "",
+  cf_password: "",
 };
-
-export default function SignIn() {
+const PasswordReset: React.FC<IPasswordResetProps> = ({
+  match: {
+    params: { uidb64, token },
+  },
+}) => {
   const dispatch = useAppDispatch();
-  const { isAuthenticated, status } = useAppSelector(selectAuth);
-
+  const { status } = useAppSelector(selectAuth);
   const history = useHistory();
-
   React.useEffect(() => {
-    if (isAuthenticated) {
-      history.push("/");
+    if (status === "success") {
+      history.push("/login");
+      dispatch(resetStatus());
     }
-  }, [isAuthenticated, history]);
+  }, [status, dispatch, history]);
 
-  const formik = useFormik<LoginPayload>({
+  const formik = useFormik<IInitialValue>({
     initialValues,
-    validationSchema: validationSchema,
+    validationSchema,
     onSubmit: (values) => {
-      dispatch(loginUser(values));
+      const { cf_password, ..._values } = values;
+      dispatch(setNewPassword({ ..._values, token, uidb64 }));
     },
   });
 
@@ -92,7 +107,7 @@ export default function SignIn() {
             <PersonIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
-            Sign in
+            Reset Password
           </Typography>
           <Box
             component="form"
@@ -100,20 +115,6 @@ export default function SignIn() {
             noValidate
             sx={{ mt: 1 }}
           >
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              id="email"
-              label="Email Address"
-              name="email"
-              autoComplete="email"
-              autoFocus
-              value={formik.values.email}
-              onChange={formik.handleChange}
-              error={formik.touched.email && Boolean(formik.errors.email)}
-              helperText={formik.touched.email && formik.errors.email}
-            />
             <TextField
               margin="normal"
               required
@@ -128,40 +129,39 @@ export default function SignIn() {
               error={formik.touched.password && Boolean(formik.errors.password)}
               helperText={formik.touched.password && formik.errors.password}
             />
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              name="cf_password"
+              label="Confirm Password"
+              type="password"
+              id="password"
+              value={formik.values.cf_password}
+              onChange={formik.handleChange}
+              error={
+                formik.touched.cf_password && Boolean(formik.errors.cf_password)
+              }
+              helperText={
+                formik.touched.cf_password && formik.errors.cf_password
+              }
+            />
             <FormControlLabel
               control={<Checkbox value="remember" color="primary" />}
               label="Remember me"
             />
-            <LoadingButton
-              type="submit"
-              fullWidth
-              variant="contained"
-              sx={{ mt: 3, mb: 2 }}
-              loading={status === "loading"}
-            >
-              Sign In
-            </LoadingButton>
-            {/* <Button
+            <Button
               type="submit"
               fullWidth
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
             >
-              Sign In
-            </Button> */}
+              Reset
+            </Button>
             <Grid container>
-              <Grid item xs>
-                <Link
-                  to="/request-reset-password"
-                  component={RouterLink}
-                  variant="body2"
-                >
-                  Forgot password?
-                </Link>
-              </Grid>
               <Grid item>
-                <Link to="/register" component={RouterLink} variant="body2">
-                  {"Don't have an account? Sign Up"}
+                <Link to="/login" component={RouterLink} variant="body2">
+                  Go to Login
                 </Link>
               </Grid>
             </Grid>
@@ -171,4 +171,6 @@ export default function SignIn() {
       </Container>
     </ThemeProvider>
   );
-}
+};
+
+export default PasswordReset;
