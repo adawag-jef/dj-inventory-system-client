@@ -5,6 +5,7 @@ import {
   LoginPayload,
   RegisterPayload,
   SetNewPasswordPayload,
+  VerifyUserPayload,
 } from "../../interfaces";
 import Client from "../../services/Client";
 
@@ -103,6 +104,21 @@ export const registerUser = createAsyncThunk<
     return thunkAPI.rejectWithValue(error.response.data);
   }
 });
+export const verifyCurrentUser = createAsyncThunk<
+  IUser,
+  VerifyUserPayload,
+  { rejectValue: ResponseError }
+>(
+  "auth/verifyCurrentUser",
+  async (requestPayload: VerifyUserPayload, thunkAPI) => {
+    try {
+      const response = await client.verifyCurrentUser(requestPayload);
+      return response;
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+);
 
 export const authSlice = createSlice({
   name: "auth",
@@ -182,6 +198,19 @@ export const authSlice = createSlice({
         state.status = "success";
       })
       .addCase(registerUser.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
+      });
+    builder
+      .addCase(verifyCurrentUser.pending, (state, action) => {
+        state.status = "loading";
+      })
+      .addCase(verifyCurrentUser.fulfilled, (state, action) => {
+        state.status = "success";
+        state.isAuthenticated = true;
+        state.user = action.payload;
+      })
+      .addCase(verifyCurrentUser.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload;
       });

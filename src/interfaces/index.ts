@@ -48,3 +48,7 @@ export interface Response<T> {
   total: number;
   results: T[];
 }
+
+export interface VerifyUserPayload {
+  token: string;
+}

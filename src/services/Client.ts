@@ -4,6 +4,7 @@ import {
   LoginPayload,
   RegisterPayload,
   SetNewPasswordPayload,
+  VerifyUserPayload,
 } from "../interfaces";
 import HttpClient from "./HttpClient";
 
@@ -48,6 +49,12 @@ export default class Client extends HttpClient {
   public setNewPassword = async (requestPayload: SetNewPasswordPayload) => {
     return await this.axiosInstance.patch<SetNewPasswordPayload>(
       "/auth/password-reset-complete/",
+      requestPayload
+    );
+  };
+  public verifyCurrentUser = async (requestPayload: VerifyUserPayload) => {
+    return await this.axiosInstance.post<VerifyUserPayload, IUser>(
+      "/auth/token-verify/",
       requestPayload
     );
   };

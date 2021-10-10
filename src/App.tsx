@@ -1,6 +1,8 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-
+import { useAppDispatch } from "./app/hooks";
+import { verifyCurrentUser } from "./features/auth/authSlice";
 import Loader from "./features/loader/Loader";
 import AuthenticatedRoute from "./hoc/AdminRoute";
 import HomePage from "./pages/home";
@@ -12,6 +14,16 @@ import RequestResetPassword from "./pages/request-reset-password";
 import UserPage from "./pages/user";
 
 const App: React.FC = (props) => {
+  const dispatch = useAppDispatch();
+  // const { status, isAuthenticated } = useAppSelector(selectAuth);
+
+  React.useEffect(() => {
+    const token = localStorage.getItem("refresh_token");
+    if (token) {
+      dispatch(verifyCurrentUser({ token }));
+    }
+  }, []);
+
   return (
     <Loader>
       <Router>
