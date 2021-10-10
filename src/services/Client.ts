@@ -11,7 +11,7 @@ export default class Client extends HttpClient {
   private static classInstance?: Client;
 
   private constructor() {
-    super("https://dj-inventory.herokuapp.com/api/");
+    super(`${process.env.REACT_APP_BASE_URL}`);
   }
 
   public static getInstance() {
