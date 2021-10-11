@@ -155,6 +155,7 @@ export const authSlice = createSlice({
       .addCase(loginUser.fulfilled, (state, action) => {
         state.user = action.payload;
         state.isAuthenticated = true;
+        state.status = "success";
         localStorage.setItem(
           "access_token",
           String(action.payload!.tokens?.access)

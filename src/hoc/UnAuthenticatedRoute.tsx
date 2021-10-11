@@ -6,9 +6,12 @@ import { selectAuth } from "../features/auth/authSlice";
 interface IAuthenticatedRouteProps extends RouteProps {}
 
 const UnAuthenticatedRoute = (props: IAuthenticatedRouteProps) => {
-  const { isAuthenticated } = useAppSelector(selectAuth);
+  const { isAuthenticated, status } = useAppSelector(selectAuth);
   const { component: Component, ...rest } = props;
   if (!Component) return null;
+  if (status === "loading") {
+    return <h2>Loading</h2>;
+  }
   return (
     <Route
       {...rest}
