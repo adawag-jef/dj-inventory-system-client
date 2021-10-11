@@ -12,6 +12,7 @@ import PasswordReset from "./pages/password-reset";
 import PermissionPage from "./pages/permission";
 import RegisterPage from "./pages/register";
 import RequestResetPassword from "./pages/request-reset-password";
+import RolePage from "./pages/role";
 import UserPage from "./pages/user";
 
 const App: React.FC = (props) => {
@@ -52,6 +53,7 @@ const App: React.FC = (props) => {
             path="/permissions"
             component={PermissionPage}
           />
+          <AuthenticatedRoute exact path="/roles" component={RolePage} />
         </Switch>
       </Router>
     </Loader>

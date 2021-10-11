@@ -52,3 +52,14 @@ export interface Response<T> {
 export interface VerifyUserPayload {
   token: string;
 }
+
+export interface ResponseError {
+  [key: string]: any;
+}
+
+export interface IRole {
+  id?: number;
+  title: string;
+  description: string;
+  permissions: IPermission[];
+}

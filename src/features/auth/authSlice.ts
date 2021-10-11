@@ -4,6 +4,7 @@ import {
   IRequestResetPasswordPayload,
   LoginPayload,
   RegisterPayload,
+  ResponseError,
   SetNewPasswordPayload,
   VerifyUserPayload,
 } from "../../interfaces";
@@ -14,10 +15,6 @@ const client = Client.getInstance();
 export interface ITokens {
   access?: string;
   refresh?: string;
-}
-
-interface ResponseError {
-  [key: string]: any;
 }
 
 export interface IUser {

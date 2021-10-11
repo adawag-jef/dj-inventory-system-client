@@ -8,12 +8,14 @@ import authSlice from "../features/auth/authSlice";
 import loaderSlice from "../features/loader/loaderSlice";
 import permissionSlice from "../features/permission/permissionSlice";
 import userSlice from "../features/user/userSlice";
+import roleSlice from "../features/role/roleSlice";
 
 const reducers = combineReducers({
   auth: authSlice,
   loader: loaderSlice,
   permission: permissionSlice,
   users: userSlice,
+  role: roleSlice,
 });
 
 const persistConfig = {

@@ -165,17 +165,17 @@ const AdminLayout: React.FC = ({ children }) => {
               </ListItemIcon>
               <ListItemText primary="Permissions" />
             </ListItem>
+            <ListItem button onClick={() => history.push("/roles")}>
+              <ListItemIcon>
+                <BarChartIcon />
+              </ListItemIcon>
+              <ListItemText primary="Roles" />
+            </ListItem>
             <ListItem button onClick={() => history.push("/users")}>
               <ListItemIcon>
                 <PeopleIcon />
               </ListItemIcon>
               <ListItemText primary="Users" />
-            </ListItem>
-            <ListItem button>
-              <ListItemIcon>
-                <BarChartIcon />
-              </ListItemIcon>
-              <ListItemText primary="Reports" />
             </ListItem>
             <ListItem button>
               <ListItemIcon>
