@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { IconButton } from "@mui/material";
 import React from "react";
 import DataTable, {
@@ -10,15 +11,33 @@ import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
   selectPermission,
   fetchAllPermissions,
+  createPermission,
+  updatePermission,
+  deletePermission,
 } from "../../features/permission/permissionSlice";
+import PermissionForm from "../../components/auth/permission-form";
+import { useFormik } from "formik";
+import { IPermission, PermissionPayload } from "../../interfaces";
+import * as yup from "yup";
+
+const validationSchema = yup.object({
+  title: yup.string().required("title is required"),
+  description: yup.string().required("description is required"),
+});
+
+const initialValues: PermissionPayload = {
+  title: "",
+  description: "",
+};
 
 const PermissionPage = () => {
   const dispatch = useAppDispatch();
   const { permissions, status, total } = useAppSelector(selectPermission);
+  const [edit, setEdit] = React.useState(false);
 
-  const handleTableChange = async (queryString: string = "") => {
+  const handleTableChange = React.useCallback((queryString: string = "") => {
     dispatch(fetchAllPermissions(queryString));
-  };
+  }, []);
 
   const columns: IDataTableColumn[] = React.useMemo(
     () => [
@@ -45,21 +64,27 @@ const PermissionPage = () => {
         name: "action",
         enableSort: false,
         align: "center",
-        action: (item: any) => {
+        action: (item: IPermission) => {
           return (
             <div style={{ display: "flex" }}>
               <IconButton
                 aria-label="delete"
                 onClick={() => {
-                  alert(JSON.stringify(item));
+                  dispatch(deletePermission(item.id));
                 }}
               >
                 <DeleteIcon />
               </IconButton>
               <IconButton
-                aria-label="delete"
+                aria-label="edit"
                 onClick={() => {
-                  alert(JSON.stringify(item));
+                  formik.setValues({
+                    ...formik.values,
+                    title: item.title,
+                    description: item.description,
+                    id: item.id,
+                  });
+                  setEdit(true);
                 }}
               >
                 <EditIcon />
@@ -72,8 +97,28 @@ const PermissionPage = () => {
     []
   );
 
+  const handleSubmit = async (values: PermissionPayload) => {
+    if (edit) {
+      dispatch(await updatePermission(values));
+    } else {
+      dispatch(await createPermission(values));
+    }
+  };
+
+  const formik = useFormik<PermissionPayload>({
+    initialValues,
+    validationSchema,
+    onSubmit: handleSubmit,
+  });
+
+  const reset = () => {
+    formik.resetForm();
+    setEdit(false);
+  };
+
   return (
     <AdminLayout>
+      <PermissionForm formik={formik} edit={edit} reset={reset} />
       <div style={{ padding: 30 }}>
         <DataTable
           columnData={columns}

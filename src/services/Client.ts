@@ -1,3 +1,4 @@
+import { AxiosResponse } from "axios";
 import { IUser } from "../features/auth/authSlice";
 import {
   IRequestResetPasswordPayload,
@@ -23,8 +24,17 @@ export default class Client extends HttpClient {
     return this.classInstance;
   }
 
-  public get<P, R = {}>(uri: string) {
+  public get<P, R = AxiosResponse<P>>(uri: string) {
     return this.axiosInstance.get<P, R>(uri);
+  }
+  public post<P, R = AxiosResponse<P>>(uri: string, payload: P) {
+    return this.axiosInstance.post<P, R>(uri, payload);
+  }
+  public put<P, R = AxiosResponse<P>>(uri: string, payload: P) {
+    return this.axiosInstance.put<P, R>(uri, payload);
+  }
+  public delete<P, R = AxiosResponse<P>>(uri: string) {
+    return this.axiosInstance.delete<P, R>(uri);
   }
 
   public registerUser = (registerPayload: RegisterPayload) =>

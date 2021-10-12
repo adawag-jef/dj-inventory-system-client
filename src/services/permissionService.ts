@@ -1,4 +1,4 @@
-import { IPermission, Response } from "../interfaces";
+import { IPermission, PermissionPayload, Response } from "../interfaces";
 import Client from "./Client";
 
 const client = Client.getInstance();
@@ -15,6 +15,19 @@ class PermissionService {
         return rej(error);
       }
     });
+  }
+
+  public async createPermission(payload: PermissionPayload) {
+    const uri = `auth/permission/`;
+    return await client.post<PermissionPayload, IPermission>(uri, payload);
+  }
+  public async updatePermission(payload: PermissionPayload, id: number) {
+    const uri = `auth/permission/${id}/`;
+    return await client.put<PermissionPayload, IPermission>(uri, payload);
+  }
+  public async deletePermission(id: number) {
+    const uri = `auth/permission/${id}/`;
+    return await client.delete(uri);
   }
 }
 

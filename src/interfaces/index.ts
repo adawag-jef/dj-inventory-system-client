@@ -31,7 +31,7 @@ export interface TokenResponse {
 export interface IPermission {
   id: number;
   title: string;
-  diescription: string;
+  description: string;
   create_at: Date;
 }
 
@@ -62,4 +62,10 @@ export interface IRole {
   title: string;
   description: string;
   permissions: IPermission[];
+}
+
+export interface PermissionPayload {
+  id?: number;
+  title: string;
+  description: string;
 }
