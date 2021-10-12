@@ -15,7 +15,7 @@ interface IPermissionForm {
 }
 
 const PermissionForm: React.FC<IPermissionForm> = ({ formik, edit, reset }) => {
-  const { status, error } = useAppSelector(selectPermission);
+  const { create, update } = useAppSelector(selectPermission);
 
   const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -35,6 +35,8 @@ const PermissionForm: React.FC<IPermissionForm> = ({ formik, edit, reset }) => {
   );
 
   const classes = useStyles();
+
+  const loading = create.status === "loading" || update.status === "loading";
 
   return (
     <React.Fragment>
@@ -58,11 +60,13 @@ const PermissionForm: React.FC<IPermissionForm> = ({ formik, edit, reset }) => {
               onChange={formik.handleChange}
               error={
                 (formik.touched.title && Boolean(formik.errors.title)) ||
-                error?.title
+                update.error?.title ||
+                create.error?.title
               }
               helperText={
                 (formik.touched.title && formik.errors.title) ||
-                (error?.title && error?.title[0])
+                (update.error?.title && update.error?.title[0]) ||
+                (create.error?.title && create.error?.title[0])
               }
             />
             <TextField
@@ -78,16 +82,18 @@ const PermissionForm: React.FC<IPermissionForm> = ({ formik, edit, reset }) => {
               error={
                 (formik.touched.description &&
                   Boolean(formik.errors.description)) ||
-                error?.description
+                update.error?.description ||
+                create.error?.description
               }
               helperText={
                 (formik.touched.description && formik.errors.description) ||
-                (error?.description && error?.description[0])
+                (update.error?.description && update.error?.description[0]) ||
+                (create.error?.description && create.error?.description[0])
               }
             />
 
             <Stack spacing={2} direction="row" className={classes.spaceTop}>
-              <LoadingButton loading={status === "loading"} type="submit">
+              <LoadingButton loading={loading} type="submit">
                 {edit ? "Update" : "Save"}
               </LoadingButton>
               {edit && (

@@ -32,7 +32,7 @@ const initialValues: PermissionPayload = {
 
 const PermissionPage = () => {
   const dispatch = useAppDispatch();
-  const { permissions, status, total } = useAppSelector(selectPermission);
+  const { list } = useAppSelector(selectPermission);
   const [edit, setEdit] = React.useState(false);
 
   const handleTableChange = React.useCallback((queryString: string = "") => {
@@ -122,10 +122,10 @@ const PermissionPage = () => {
       <div style={{ padding: 30 }}>
         <DataTable
           columnData={columns}
-          rows={permissions}
+          rows={list.permissions}
           onChange={handleTableChange}
-          total={total}
-          loading={status === "loading"}
+          total={list.total}
+          loading={list.status === "loading"}
         />
       </div>
     </AdminLayout>

@@ -45,7 +45,6 @@ export const updatePermission = createAsyncThunk<
   "auth/updatePermission",
   async (requestPayload: PermissionPayload, thunkAPI) => {
     const { id, ...payload } = requestPayload;
-    debugger;
     if (!id)
       return thunkAPI.rejectWithValue({ error: "Something went wrong." });
     try {
@@ -69,18 +68,39 @@ export const deletePermission = createAsyncThunk<
   }
 });
 
-interface IPermissionState {
-  permissions: IPermission[];
+interface BasicState {
   status: "idle" | "loading" | "failed";
-  total: number;
   error: ResponseError | undefined;
+}
+interface IPermissionState {
+  list: BasicState & {
+    permissions: IPermission[];
+    total: number;
+  };
+  create: BasicState;
+  update: BasicState;
+  destroy: BasicState;
 }
 
 const initialState: IPermissionState = {
-  permissions: [],
-  status: "idle",
-  total: 0,
-  error: undefined,
+  list: {
+    permissions: [],
+    status: "idle",
+    total: 0,
+    error: undefined,
+  },
+  create: {
+    status: "idle",
+    error: undefined,
+  },
+  update: {
+    status: "idle",
+    error: undefined,
+  },
+  destroy: {
+    status: "idle",
+    error: undefined,
+  },
 };
 
 export const permissionSlice = createSlice({
@@ -89,67 +109,79 @@ export const permissionSlice = createSlice({
 
   reducers: {
     setPermissionList: (state, action: PayloadAction<IPermission[]>) => {
-      state.permissions = action.payload;
+      state.list.permissions = action.payload;
     },
   },
 
   extraReducers: (builder) => {
     builder
       .addCase(fetchAllPermissions.pending, (state, action) => {
-        state.status = "loading";
+        state.list.status = "loading";
       })
       .addCase(fetchAllPermissions.fulfilled, (state, action) => {
-        state.status = "idle";
-        state.permissions = action.payload.results;
-        state.total = action.payload.total;
+        state.list.status = "idle";
+        state.list.permissions = action.payload.results;
+        state.list.total = action.payload.total;
       })
       .addCase(fetchAllPermissions.rejected, (state) => {
-        state.status = "failed";
-        state.permissions = [];
+        state.list.status = "failed";
+        state.list.permissions = [];
       });
     builder
       .addCase(createPermission.pending, (state, action) => {
-        state.status = "loading";
+        state.create.status = "loading";
       })
       .addCase(createPermission.fulfilled, (state, action) => {
-        state.status = "idle";
-        state.permissions.unshift(action.payload);
-        state.total++;
+        state.create.status = "idle";
+        state.list.permissions.unshift(action.payload);
+        state.list.total++;
+        state.create.error = undefined;
+        state.update.error = undefined;
+        state.destroy.error = undefined;
       })
       .addCase(createPermission.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = action.payload;
+        state.create.status = "failed";
+        state.create.error = action.payload;
       });
     builder
       .addCase(updatePermission.pending, (state, action) => {
-        state.status = "loading";
+        state.update.status = "loading";
+        state.create.error = undefined;
+        state.update.error = undefined;
+        state.destroy.error = undefined;
       })
       .addCase(updatePermission.fulfilled, (state, action) => {
-        state.status = "idle";
-        state.permissions = state.permissions.map((item) => {
+        state.update.status = "idle";
+        state.list.permissions = state.list.permissions.map((item) => {
           if (item.id === action.payload.id) {
             return action.payload;
           }
           return item;
         });
+        state.create.error = undefined;
+        state.update.error = undefined;
+        state.destroy.error = undefined;
       })
       .addCase(updatePermission.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = action.payload;
+        state.update.status = "failed";
+        state.update.error = action.payload;
       });
     builder
       .addCase(deletePermission.pending, (state) => {
-        state.status = "loading";
+        state.destroy.status = "loading";
       })
       .addCase(deletePermission.fulfilled, (state, action) => {
-        state.status = "idle";
-        state.permissions = state.permissions.filter(
+        state.destroy.status = "idle";
+        state.list.permissions = state.list.permissions.filter(
           (item) => item.id !== action.payload
         );
+        state.create.error = undefined;
+        state.update.error = undefined;
+        state.destroy.error = undefined;
       })
       .addCase(deletePermission.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = action.payload;
+        state.destroy.status = "failed";
+        state.destroy.error = action.payload;
       });
   },
 });
