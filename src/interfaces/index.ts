@@ -58,7 +58,7 @@ export interface ResponseError {
 }
 
 export interface IRole {
-  id?: number;
+  id: number;
   title: string;
   description: string;
   permissions: IPermission[];
@@ -68,4 +68,10 @@ export interface PermissionPayload {
   id?: number;
   title: string;
   description: string;
+}
+export interface RolePayload {
+  id?: number;
+  title: string;
+  description: string;
+  permissions: number[];
 }

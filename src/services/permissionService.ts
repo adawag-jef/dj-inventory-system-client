@@ -17,6 +17,10 @@ class PermissionService {
     });
   }
 
+  public async listPermission(): Promise<IPermission[]> {
+    const uri = `auth/permission/?pages=All`;
+    return await client.get(uri);
+  }
   public async createPermission(payload: PermissionPayload) {
     const uri = `auth/permission/`;
     return await client.post<PermissionPayload, IPermission>(uri, payload);
