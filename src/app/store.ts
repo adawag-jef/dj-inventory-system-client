@@ -23,10 +23,10 @@ const persistConfig = {
   storage,
 };
 
-// const persistedReducer = persistReducer(persistConfig, reducers);
+const persistedReducer = persistReducer(persistConfig, reducers);
 
 export const store = configureStore({
-  reducer: reducers,
+  reducer: persistedReducer,
 });
 
 export type AppDispatch = typeof store.dispatch;
