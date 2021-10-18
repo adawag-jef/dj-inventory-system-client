@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import { IconButton } from "@mui/material";
 import React from "react";
 import DataTable, {
@@ -35,9 +34,26 @@ const PermissionPage = () => {
   const { list } = useAppSelector(selectPermission);
   const [edit, setEdit] = React.useState(false);
 
-  const handleTableChange = React.useCallback((queryString: string = "") => {
-    dispatch(fetchAllPermissions(queryString));
-  }, []);
+  const handleTableChange = React.useCallback(
+    (queryString: string = "") => {
+      dispatch(fetchAllPermissions(queryString));
+    },
+    [dispatch]
+  );
+
+  const handleSubmit = async (values: PermissionPayload) => {
+    if (edit) {
+      dispatch(await updatePermission(values));
+    } else {
+      dispatch(await createPermission(values));
+    }
+  };
+
+  const formik = useFormik<PermissionPayload>({
+    initialValues,
+    validationSchema,
+    onSubmit: handleSubmit,
+  });
 
   const columns: IDataTableColumn[] = React.useMemo(
     () => [
@@ -94,22 +110,8 @@ const PermissionPage = () => {
         },
       },
     ],
-    []
+    [dispatch, formik]
   );
-
-  const handleSubmit = async (values: PermissionPayload) => {
-    if (edit) {
-      dispatch(await updatePermission(values));
-    } else {
-      dispatch(await createPermission(values));
-    }
-  };
-
-  const formik = useFormik<PermissionPayload>({
-    initialValues,
-    validationSchema,
-    onSubmit: handleSubmit,
-  });
 
   const reset = () => {
     formik.resetForm();

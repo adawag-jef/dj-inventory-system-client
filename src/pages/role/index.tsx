@@ -40,6 +40,20 @@ const RolePage = () => {
     dispatch(fetchAllRoles(queryString));
   };
 
+  const handleSubmit = (values: RolePayload) => {
+    if (edit) {
+      dispatch(updateRole(values));
+    } else {
+      dispatch(createRole(values));
+    }
+  };
+
+  const formik = useFormik<RolePayload>({
+    initialValues,
+    validationSchema,
+    onSubmit: handleSubmit,
+  });
+
   const columns: IDataTableColumn[] = React.useMemo(
     () => [
       {
@@ -96,21 +110,8 @@ const RolePage = () => {
         },
       },
     ],
-    []
+    [dispatch, formik]
   );
-  const handleSubmit = (values: RolePayload) => {
-    if (edit) {
-      dispatch(updateRole(values));
-    } else {
-      dispatch(createRole(values));
-    }
-  };
-
-  const formik = useFormik<RolePayload>({
-    initialValues,
-    validationSchema,
-    onSubmit: handleSubmit,
-  });
 
   const reset = () => {
     formik.resetForm();
