@@ -1,14 +1,22 @@
+import { Logout, Settings } from "@mui/icons-material";
 import BarChartIcon from "@mui/icons-material/BarChart";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import LayersIcon from "@mui/icons-material/Layers";
 import MenuIcon from "@mui/icons-material/Menu";
-import NotificationsIcon from "@mui/icons-material/Notifications";
 import PeopleIcon from "@mui/icons-material/People";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import { ListItem, ListItemIcon, ListItemText } from "@mui/material";
+import {
+  Avatar,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  ListSubheader,
+  Menu,
+  MenuItem,
+  Tooltip,
+} from "@mui/material";
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
-import Badge from "@mui/material/Badge";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -22,6 +30,8 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import * as React from "react";
 import { useHistory } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "../app/hooks";
+import { logoutUser, selectAuth } from "../features/auth/authSlice";
 
 function Copyright(props: any) {
   return (
@@ -94,11 +104,30 @@ const Drawer = styled(MuiDrawer, {
 const mdTheme = createTheme();
 
 const AdminLayout: React.FC = ({ children }) => {
+  const dispatch = useAppDispatch();
+  const { user } = useAppSelector(selectAuth);
+
   const [open, setOpen] = React.useState(true);
   const toggleDrawer = () => {
     setOpen(!open);
   };
   const history = useHistory();
+
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const openMenu = Boolean(anchorEl);
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const userInitials = React.useMemo(() => {
+    if (user) {
+      return user?.username[0] + user?.username[1];
+    }
+    return "";
+  }, [user]);
 
   return (
     <ThemeProvider theme={mdTheme}>
@@ -131,11 +160,82 @@ const AdminLayout: React.FC = ({ children }) => {
             >
               Dashboard
             </Typography>
-            <IconButton color="inherit">
+            {/* <IconButton color="inherit">
               <Badge badgeContent={4} color="secondary">
                 <NotificationsIcon />
               </Badge>
-            </IconButton>
+            </IconButton> */}
+            <Tooltip title="Account settings">
+              <IconButton onClick={handleClick} size="small" sx={{ ml: 2 }}>
+                <Avatar sx={{ width: 32, height: 32 }}>{userInitials}</Avatar>
+              </IconButton>
+            </Tooltip>
+            <>
+              <Menu
+                anchorEl={anchorEl}
+                open={openMenu}
+                onClose={handleClose}
+                onClick={handleClose}
+                PaperProps={{
+                  elevation: 0,
+                  sx: {
+                    overflow: "visible",
+                    filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
+                    mt: 1.5,
+                    "& .MuiAvatar-root": {
+                      width: 32,
+                      height: 32,
+                      ml: -0.5,
+                      mr: 1,
+                    },
+                    "&:before": {
+                      content: '""',
+                      display: "block",
+                      position: "absolute",
+                      top: 0,
+                      right: 14,
+                      width: 10,
+                      height: 10,
+                      bgcolor: "background.paper",
+                      transform: "translateY(-50%) rotate(45deg)",
+                      zIndex: 0,
+                    },
+                  },
+                }}
+                transformOrigin={{ horizontal: "right", vertical: "top" }}
+                anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+              >
+                <MenuItem>
+                  <Avatar /> Profile
+                </MenuItem>
+                <MenuItem>
+                  <Avatar /> My account
+                </MenuItem>
+                <Divider />
+                <MenuItem>
+                  <ListItemIcon>
+                    <Settings fontSize="small" />
+                  </ListItemIcon>
+                  Settings
+                </MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    dispatch(
+                      logoutUser({
+                        refresh: localStorage.getItem(
+                          "refresh_token"
+                        ) as string,
+                      })
+                    );
+                  }}
+                >
+                  <ListItemIcon>
+                    <Logout fontSize="small" />
+                  </ListItemIcon>
+                  Logout
+                </MenuItem>
+              </Menu>
+            </>
           </Toolbar>
         </AppBar>
         <Drawer variant="permanent" open={open}>
@@ -185,7 +285,15 @@ const AdminLayout: React.FC = ({ children }) => {
             </ListItem>
           </List>
           <Divider />
-          {/* <List>{secondaryListItems}</List> */}
+          <>
+            <ListSubheader inset>{""}</ListSubheader>
+            <ListItem button>
+              <ListItemIcon>
+                <LayersIcon />
+              </ListItemIcon>
+              <ListItemText primary="Current month" />
+            </ListItem>
+          </>
         </Drawer>
         <Box
           component="main"

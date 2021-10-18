@@ -7,6 +7,9 @@ export interface LoginPayload {
   email: string;
   password: string;
 }
+export interface LogoutPayload {
+  refresh: string;
+}
 
 export interface SetNewPasswordPayload {
   password: string;

@@ -3,6 +3,7 @@ import { RootState } from "../../app/store";
 import {
   IRequestResetPasswordPayload,
   LoginPayload,
+  LogoutPayload,
   RegisterPayload,
   ResponseError,
   SetNewPasswordPayload,
@@ -116,6 +117,18 @@ export const verifyCurrentUser = createAsyncThunk<
     }
   }
 );
+export const logoutUser = createAsyncThunk<
+  boolean,
+  LogoutPayload,
+  { rejectValue: ResponseError }
+>("auth/logoutUser", async (requestPayload: LogoutPayload, thunkAPI) => {
+  try {
+    await client.logout(requestPayload);
+    return true;
+  } catch (error: any) {
+    return thunkAPI.rejectWithValue(error.response.data);
+  }
+});
 
 export const authSlice = createSlice({
   name: "auth",
@@ -213,6 +226,28 @@ export const authSlice = createSlice({
         state.isAuthenticated = false;
         state.error = action.payload;
         localStorage.clear();
+      });
+    builder
+      .addCase(logoutUser.pending, (state, action) => {
+        state.status = "loading";
+      })
+      .addCase(logoutUser.fulfilled, (state, action) => {
+        state.status = "success";
+        state.isAuthenticated = false;
+        state.user = {
+          id: 0,
+          email: "",
+          username: "",
+          tokens: {
+            access: "",
+            refresh: "",
+          },
+        };
+        localStorage.clear();
+      })
+      .addCase(logoutUser.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
       });
   },
 });

@@ -3,6 +3,7 @@ import { IUser } from "../features/auth/authSlice";
 import {
   IRequestResetPasswordPayload,
   LoginPayload,
+  LogoutPayload,
   RegisterPayload,
   SetNewPasswordPayload,
   VerifyUserPayload,
@@ -65,6 +66,12 @@ export default class Client extends HttpClient {
   public verifyCurrentUser = async (requestPayload: VerifyUserPayload) => {
     return await this.axiosInstance.post<VerifyUserPayload, IUser>(
       "/auth/token-verify/",
+      requestPayload
+    );
+  };
+  public logout = async (requestPayload: LogoutPayload) => {
+    return await this.axiosInstance.post<LogoutPayload>(
+      "/auth/logout/",
       requestPayload
     );
   };
